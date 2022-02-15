@@ -1,8 +1,9 @@
 package dbtoolkit.database
 
 import java.sql._
-
 import dialect.Dialect
+
+import scala.collection.MapView
 
 /**
   * Helper for reading DatabaseMetaData
@@ -52,14 +53,15 @@ object MetadataReader {
       .groupBy(_._1)
       .map { case (k,v) => k -> v.map(_._2).filterNot( _ == k) }
       .withDefault(_ => Nil)
+      .view
 
-    def _reduce(tables: Set[ObjRef], deps: Map[ObjRef, List[ObjRef]], acc: Seq[ObjRef]): Seq[ObjRef] = {
+    def _reduce(tables: Set[ObjRef], deps: MapView[ObjRef, List[ObjRef]], acc: Seq[ObjRef]): Seq[ObjRef] = {
       tables.size match {
         case 0 => acc
         case _ =>
           val (indep, dep) = tables.partition(deps(_).isEmpty)
           val done = acc ++ indep.toSeq.sortBy(_.name) //sorting each table layer, so the order is the same from any machine
-          val rest = deps.filterKeys(dep).mapValues(_.filterNot(done.toSet))
+          val rest = deps.view.filterKeys(dep).mapValues(_.filterNot(done.toSet))
           _reduce(tables.filterNot(indep), rest, done)
       }
     }

@@ -1,7 +1,6 @@
 package dbtoolkit.database
 
 import java.sql.{Connection, DatabaseMetaData}
-
 import com.typesafe.config.Config
 import dbtoolkit.common.Collector
 import dbtoolkit.database.DataTool.{IdResolver, ValueSet}
@@ -9,6 +8,7 @@ import dbtoolkit.database.ValueTransformers.ValueSetTransformer
 import dbtoolkit.database.dialect.{Dialect, TableValueFormatter}
 
 import scala.collection.JavaConverters._
+import scala.collection.MapView
 
 //TODO
 //-add formatter support
@@ -192,7 +192,9 @@ class DataTool(selection: DataSelection)
         case Some(map) =>
           val keys = selection.pks(ref).toSet
           val formatter = selection.formatters(ref)
-          val byPkOnly = map.filterKeys(_.keySet == keys) //keeping only rows by pk
+          val byPkOnly = map.view.filterKeys(_.keySet == keys) //keeping only rows by pk
+
+          //          val byPkOnly = map.filterKeys(_.keySet == keys) //keeping only rows by pk
           getRowsForDelete(ref, byPkOnly).map { el =>
             println(el)
             collector(dialect.deleteQuery(ref, el.toList, formatter))
@@ -223,7 +225,7 @@ class DataTool(selection: DataSelection)
     }
   }
 
-  private def getRowsForDelete(ref: ObjRef, map: Map[ValueSet, ValueSet]): List[ValueSet] = map.isEmpty match {
+  private def getRowsForDelete(ref: ObjRef, map: MapView[ValueSet, ValueSet]): List[ValueSet] = map.isEmpty match {
     case true => Nil
     case false => selection.selfReferencing(ref) match {
       case true =>
