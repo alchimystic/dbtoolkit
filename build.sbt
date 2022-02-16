@@ -1,15 +1,9 @@
-import sbt.Keys.libraryDependencies
+name := "dbtoolkit"
 
-lazy val root = (project in file(".")).
-  settings(
-    inThisBuild(List(
-      organization := "zalando",
-      scalaVersion := "2.13.8",
-      version      := "0.1.0-SNAPSHOT"
-    )),
-    name := "dbtoolkit",
+scalaVersion := "2.13.8"
+version      := "0.1.0-SNAPSHOT"
 
-    libraryDependencies += "org.postgresql" % "postgresql" % "42.2.1",
-    libraryDependencies += "com.github.kxbmap" %% "configs" % "0.6.1",
-
-  )
+libraryDependencies ++= Seq(
+  "org.postgresql" % "postgresql" % "42.2.1",
+  "com.github.kxbmap" %% "configs" % "0.6.1",
+)
