@@ -9,7 +9,7 @@ This can be used ot extract data subsets from a database.
 
 ## Data Eraser
 
-Generates DELETE scripts for selected records and theis dependents
+Generates DELETE scripts for selected records and their dependents. 
 The opposite of the Data Extractor
 
 ## Jpa Domain Generator
